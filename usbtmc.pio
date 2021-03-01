@@ -1,0 +1,14 @@
+.program slow_in
+
+.wrap_target
+slow_in:
+    in pins, 8
+    set x, 20
+delay_loop:
+    nop [20]
+    nop [20]
+    nop [20]
+    nop [20]
+    nop [20]
+    jmp x-- delay_loop
+.wrap
