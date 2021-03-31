@@ -43,52 +43,67 @@ bool TRIGGER = false; // true = high : false = low
 uint offset;
 struct pio_program *capture_prog_2=NULL;
 
-void logic_analyser_init(PIO pio, uint sm, uint pin_base, uint pin_count, float div) {
-    // Load a program to capture n pins. This is just a single `in pins, n`
-    // instruction with a wrap.
-    uint16_t slow_capture_prog_instr[] = {
-        0x4008, //  0: in     pins, 8                    
-        0xe034, //  1: set    x, 20                      
-        0xb442, //  2: nop                           [20]
-        0xb442, //  3: nop                           [20]
-        0xb442, //  4: nop                           [20]
-        0xb442, //  5: nop                           [20]
-        0xb442, //  6: nop                           [20]
-        0x0042, //  7: jmp    x--, 2                     
+void load_slow_capture(PIO pio)
+{
+    // uint16_t slow_capture_prog_instr[] = {
+    //     0x4008, //  0: in     pins, 8                    
+    //     0xe033, //  1: set    x, 19                      
+    //     0xb442, //  2: nop                           [20]
+    //     0xb442, //  3: nop                           [20]
+    //     0xb442, //  4: nop                           [20]
+    //     0xb442, //  5: nop                           [20]
+    //     0xb442, //  6: nop                           [20]
+    //     0x0042, //  7: jmp    x--, 2                     
+    // };
 
-    };
-    struct pio_program capture_prog = {
-        .instructions = slow_capture_prog_instr,
-        .length = 8,
-        .origin = -1
-    };
-
-    uint16_t capture_prog_instr = pio_encode_in(pio_pins, pin_count);
-
-    if( div < 62500.0)  
-    {
-        capture_prog.instructions = &capture_prog_instr;
-        capture_prog.length = 1;
-    }
-    else
-    {
-        div = div / 2000;
-    }
+    // struct pio_program capture_prog = {
+    //     .instructions = slow_capture_prog_instr,
+    //     .length = 8,
+    //     .origin = -1
+    // };
 
     if(capture_prog_2)
         pio_remove_program(pio, capture_prog_2, offset);
 
-    capture_prog_2 = &capture_prog;
+    capture_prog_2 = &slow_in_program;
 
-    offset = pio_add_program(pio, &capture_prog);
+    offset = pio_add_program(pio, &slow_in_program);
+}
+
+void load_fast_capture(PIO pio, uint pin_count)
+{
+    if(capture_prog_2)
+        pio_remove_program(pio, capture_prog_2, offset);
+
+    capture_prog_2 = &fast_in_program;
+
+    offset = pio_add_program(pio, &fast_in_program);
+}
+
+void logic_analyser_init(PIO pio, uint sm, uint pin_base, uint pin_count, float div) {
+    // Load a program to capture n pins. This is just a single `in pins, n`
+    // instruction with a wrap.
+    
+    pio_sm_config c = pio_get_default_sm_config();
+
+    if( div < 62500.0)  
+    {
+        load_fast_capture(pio, 8);
+        sm_config_set_wrap(&c, offset, offset);
+    }
+    else
+    {
+        div = div / 2000;
+        load_slow_capture(pio);
+        sm_config_set_wrap(&c, offset, offset+7);
+    }
+
 
     // Configure state machine to loop over this `in` instruction forever,
     // with autopush enabled.
-    pio_sm_config c = pio_get_default_sm_config();
     sm_config_set_in_pins(&c, pin_base);
     sm_config_set_out_pins(&c, 25,1);
 
-    sm_config_set_wrap(&c, offset, offset+7);
     sm_config_set_clkdiv(&c, div);
     sm_config_set_in_shift(&c, true, true, 32);
     sm_config_set_fifo_join(&c, PIO_FIFO_JOIN_RX);

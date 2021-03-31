@@ -55,7 +55,6 @@ void led_blinking_task(void);
 /*------------- MAIN -------------*/
 int main(void)
 {
-  uint o = 1;
   board_init();
   gpio_init(LED_PIN);
   gpio_set_dir(LED_PIN, GPIO_OUT);
@@ -69,8 +68,6 @@ int main(void)
     tud_task(); // tinyusb device task
     led_blinking_task();
     usbtmc_app_task_iter();
-    gpio_put(13, o);
-    o = 1- o;
   }
 
   return 0;

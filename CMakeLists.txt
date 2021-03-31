@@ -24,6 +24,7 @@ add_executable(usbtmc
         usb_descriptors.c 
         usbtmc_app.c 
         rp2040-logic-analyzer.c
+        commands.c
 )
 
 target_include_directories(usbtmc PRIVATE ${CMAKE_CURRENT_LIST_DIR})
