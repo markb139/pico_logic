@@ -28,9 +28,6 @@
 #include "tusb.h"
 #include "bsp/board.h"
 #include "main.h"
-#include "hardware/pio.h"
-#include "hardware/dma.h"
-#include "hardware/clocks.h"
 
 #if (CFG_TUD_USBTMC_ENABLE_488)
 static usbtmc_response_capabilities_488_t const
@@ -74,15 +71,8 @@ tud_usbtmc_app_capabilities  =
 #define IEEE4882_STB_SER          (0x20u)
 #define IEEE4882_STB_SRQ          (0x40u)
 
-static const char idn[] = "TinyUSB,ModelNumber,SerialNumber,FirmwareVer123456\r\n";
-static const char opc_1[] = "1\r\n";
-static const char opc_0[] = "0\r\n";
-
-static bool commandComplete;
-static bool sampleRun;
 uint8_t count = 0;
 
-//static const char idn[] = "TinyUSB,ModelNumber,SerialNumber,FirmwareVer and a bunch of other text to make it longer than a packet, perhaps? lets make it three transfers...\n";
 static volatile uint8_t status;
 
 // 0=not query, 1=queried, 2=delay,set(MAV), 3=delay 4=ready?
@@ -99,19 +89,22 @@ static volatile enum _states queryState = QStart;
 
 static volatile uint32_t queryDelayStart;
 static volatile uint32_t bulkInStarted;
-static volatile uint32_t idnQuery;
-static volatile uint32_t opcQuery;
-static volatile uint32_t waveQuery;
-volatile int num_samples = 0;
-volatile float sample_rate = 1000.0;
+
+static volatile uint32_t iCmdResponse;
+static uint8_t const *iCmdResponseBuf;
+static size_t iCmdResponseBufLen;
+
+//static volatile uint32_t waveQuery;
 
 static uint32_t resp_delay = 125u; // Adjustable delay, to allow for better testing
 static size_t buffer_len;
 static size_t buffer_tx_ix; // for transmitting using multiple transfers
 static uint8_t buffer[225]; // A few packets long should be enough.
 
-uint32_t *capture_buf = 0;
+//uint32_t *capture_buf = 0;
 
+bool process_command(uint8_t* aData, size_t aLen);
+bool command_complete();
 
 static usbtmc_msg_dev_dep_msg_in_header_t rspMsg = {
     .bmTransferAttributes =
@@ -176,46 +169,13 @@ bool tud_usbtmc_msg_data_cb(void *data, size_t len, bool transfer_complete)
     queryState = QStart;
   //queryState = transfer_complete;
   
-  idnQuery = 0;
-  opcQuery=0;
-  waveQuery=0;
+  iCmdResponse = 0;
 
-  if(transfer_complete && (len >=4) && !strncasecmp("*idn?",data,4))
+  if (transfer_complete)
   {
-    idnQuery = 1;
-    led_indicator_pulse();
+    process_command(data, len);
   }
-  if(transfer_complete && (len >=4) && !strncasecmp("*opc?",data,4))
-  {
-    opcQuery = 1;
-  }
-  if(transfer_complete && (len >=5) && !strncasecmp("rate ",data,5))
-  {
-    queryState = QStart;
-    sample_rate = atof((char*)data + 5);
-  }
-  if(transfer_complete && (len >=9) && strncasecmp("l:capture ",data,9) == 0)
-  {
-    PIO pio = pio0;
-    uint sm = 0;
-    uint dma_chan = 0;
-    num_samples = tu_max32(atoi((char*)data + 10), 1);
-    float sample_div = (float) clock_get_hz(clk_sys) / sample_rate;
-    
-    if(!run_analyzer(8, num_samples, pio, sm, 15, sample_div, dma_chan,true))
-    {
-      queryState = QStart;
-    }
-    else
-    {
-      sampleRun = false;
-      commandComplete = false;
-    }
-  }
-  if(transfer_complete && (len >=5) && !strncasecmp("data?",data,5))
-  {
-    waveQuery = 1;
-  }
+
   if(transfer_complete && !strncasecmp("delay ",data,5))
   {
     queryState = QStart;
@@ -230,29 +190,9 @@ bool tud_usbtmc_msg_data_cb(void *data, size_t len, bool transfer_complete)
   return true;
 }
 
-bool run_analyzer(uint pin_count, uint sample_count, PIO pio, uint sm, uint pin_base, float freq_div, uint dma_chan, bool trigger)
-{
-  uint32_t word_count = ((pin_count * sample_count) + 31) / 32;
-  uint32_t capture_buf_memory_size = word_count * sizeof(uint32_t);
-  if(capture_buf)
-  {
-    free(capture_buf);
-  }
-  capture_buf = malloc(8 + capture_buf_memory_size);
-  if (capture_buf == NULL) {
-      return false;
-  }
-
-  logic_analyser_init(pio, sm, pin_base, pin_count, freq_div);
-
-  logic_analyser_arm(pio, sm, dma_chan, capture_buf, word_count, pin_base, trigger, dma_irq);
-
-  return true;
-}
-
 bool tud_usbtmc_msgBulkIn_complete_cb()
 {
-  if((buffer_tx_ix == buffer_len) || idnQuery) // done
+  if((buffer_tx_ix == buffer_len) || iCmdResponse) // done
   {
     status &= (uint8_t)~(IEEE4882_STB_MAV); // clear MAV
     queryState = QStart;
@@ -295,12 +235,11 @@ bool tud_usbtmc_msgBulkIn_request_cb(usbtmc_msg_request_dev_dep_in const * reque
   return true;
 }
 
-void dma_irq()
+bool command_complete(uint8_t const *aBuffer, size_t aLen)
 {
-  dma_hw->ints0 = 1u << 0;
-  commandComplete = true;
-  sampleRun = false;
-
+  iCmdResponseBuf = aBuffer;
+  iCmdResponseBufLen = aLen;
+  iCmdResponse = 1;
 }
 
 void usbtmc_app_task_iter(void) {
@@ -326,31 +265,10 @@ void usbtmc_app_task_iter(void) {
     break;
   case QSendResult: // time to transmit;
     if(bulkInStarted && (buffer_tx_ix == 0)) {
-      if(idnQuery)
+      if(iCmdResponse)
       {
-        tud_usbtmc_transmit_dev_msg_data(idn,  tu_min32(sizeof(idn)-1,msgReqLen),true,false);
-        queryState = QStart;
-        bulkInStarted = 0;
-      }
-      else if(opcQuery)
-      {
-        if(commandComplete)
-          tud_usbtmc_transmit_dev_msg_data(opc_1, tu_min32(sizeof(opc_1)-1,msgReqLen),true,false);
-        else
-          tud_usbtmc_transmit_dev_msg_data(opc_0, tu_min32(sizeof(opc_0)-1,msgReqLen),true,false);
-        
-        queryState = QStart;
-        bulkInStarted = 0;
-      }
-      else if(waveQuery)
-      {
-        uint8_t header[12];
-        uint8_t* buffer = (uint8_t*)capture_buf;
-        sprintf(header, "#6%06d", num_samples);
-        for(int i=0;i<8;i++)
-          buffer[i] = header[i];
-        
-        tud_usbtmc_transmit_dev_msg_data((uint8_t*)capture_buf, tu_min32(8+num_samples, msgReqLen), true, false);
+        size_t tx_len = tu_min32(iCmdResponseBufLen, msgReqLen);
+        tud_usbtmc_transmit_dev_msg_data(iCmdResponseBuf,  tx_len,true,false);
         queryState = QStart;
         bulkInStarted = 0;
       }
