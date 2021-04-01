@@ -1,4 +1,11 @@
 /**
+ * Modified by Mark Burton 2021
+ * Removed serial command handling
+ * use dma for background capture
+ * use 2 different PIO programms for fast and slow capture - min PIO clock is 2khz
+ * /
+
+/**
  * Modified by Mark Komus 2021
  * Now repeatedly captures data and outputs to a CSV format
  * Intended to be imported by sigrok / PulseView
@@ -27,41 +34,11 @@
 #include "hardware/clocks.h"
 #include "usbtmc.pio.h"
 
-#if 0
-const uint LED_PIN = 25;
-#endif
-
-// Defaults - just what I tested with any legal value is fine
-uint CAPTURE_PIN_BASE = 17;
-uint CAPTURE_PIN_COUNT = 2;
-uint CAPTURE_N_SAMPLES = 200000;
-float FREQ_DIV = 125.0f; // Divide 125Mhz by this to get your freq
-uint FREQUENCY = 1000000;
-bool TRIGGER = false; // true = high : false = low
-
-
 uint offset;
 struct pio_program *capture_prog_2=NULL;
 
 void load_slow_capture(PIO pio)
 {
-    // uint16_t slow_capture_prog_instr[] = {
-    //     0x4008, //  0: in     pins, 8                    
-    //     0xe033, //  1: set    x, 19                      
-    //     0xb442, //  2: nop                           [20]
-    //     0xb442, //  3: nop                           [20]
-    //     0xb442, //  4: nop                           [20]
-    //     0xb442, //  5: nop                           [20]
-    //     0xb442, //  6: nop                           [20]
-    //     0x0042, //  7: jmp    x--, 2                     
-    // };
-
-    // struct pio_program capture_prog = {
-    //     .instructions = slow_capture_prog_instr,
-    //     .length = 8,
-    //     .origin = -1
-    // };
-
     if(capture_prog_2)
         pio_remove_program(pio, capture_prog_2, offset);
 
@@ -134,194 +111,3 @@ void logic_analyser_arm(PIO pio, uint sm, uint dma_chan, uint32_t *capture_buf, 
     pio_sm_exec(pio, sm, pio_encode_wait_gpio(trigger_level, trigger_pin));
     pio_sm_set_enabled(pio, sm, true);
 }
-
-#if 0
-void print_capture_buf_csv(const uint32_t *buf, uint pin_base, uint pin_count, uint32_t n_samples) {
-    for (int sample = 0; sample < n_samples; ++sample) {
-        for (int pin = 0; pin < pin_count; ++pin) {
-            uint bit_index = pin + sample * pin_count;
-            bool level = !!(buf[bit_index / 32] & 1u << (bit_index % 32));
-            printf(level ? "1" : "0");
-            printf(",");
-        }
-
-        // Blink the LED every 2500 samples to show something is happening
-        // Good for a serial capture where you cannot see if it is still outputting
-        if ((sample % 5000) == 0)
-            gpio_put(LED_PIN, 1);
-        else if ((sample % 5000) == 2500)
-            gpio_put(LED_PIN, 0);
-
-        printf("\n");
-    }
-}
-#endif
-
-void read_user_input() {
-    const int BUFFER_MAX = 11;
-    char buffer[BUFFER_MAX+1];
-
-    while (true) {
-        memset(buffer, 0, BUFFER_MAX+1);
-        int bufpos = 0;
-        int c = 0;
-
-        while (c != '\r') {
-            c = getchar_timeout_us(30000000);
-            if (c == -1) continue; // timeout ran out
-            if (c == '\r' || c == '\n') break;
-
-            buffer[bufpos++] = (char)c;
-            printf("%c", c);
-            if (bufpos >= BUFFER_MAX)
-                break;
-        }
-        printf("\n");
-
-        if (buffer[0] == 'p') {
-            int pin = -1;
-            if (isdigit(buffer[1]) != 0) {
-                pin = strtol(buffer+1, NULL, 10);
-                if (pin > 28)
-                    pin = -1;
-            }
-
-            if (pin == -1)
-                printf("Pin number is not valid\n");
-            else {
-                printf("Start pin is %d\n", pin);
-                CAPTURE_PIN_BASE = pin;
-            }
-        }
-        else if (buffer[0] == 'n') {
-            int number = -1;
-            if (isdigit(buffer[1]) != 0) {
-                number = strtol(buffer+1, NULL, 10);
-                if (number > 28)
-                    number = -1;
-            }
-
-            if (number == -1)
-                printf("Number of pins is not valid\n");
-            else {
-                printf("Total pins is %d\n", number);
-                CAPTURE_PIN_COUNT = number;
-            }
-        }
-        else if (buffer[0] == 'f') {
-            uint freq = 0;
-            if (isdigit(buffer[1]) != 0) {
-                freq = strtol(buffer+1, NULL, 10);
-                if (freq > clock_get_hz(clk_sys))
-                    freq = 0;
-            }
-
-            if (freq < 0)
-                printf("Frequency is not valid\n");
-            else {
-                FREQUENCY = freq;
-                FREQ_DIV = clock_get_hz(clk_sys) / (float)FREQUENCY;
-                printf("Frequency is %d div is %f\n", FREQUENCY, FREQ_DIV);
-            }
-        }
-        else if (buffer[0] == 't') {
-            int t = -1;
-            if (buffer[1] == 't' || buffer[1] == '1')
-                t = 1;
-            else if (buffer[1] == 'f' || buffer[1] == '0')
-                t = 0;
-
-            if (t < 0)
-                printf("Trigger value is not valid\n");
-            else {
-                TRIGGER = t;
-                printf("Trigger set to %d\n", TRIGGER);
-            }
-        }
-        else if (buffer[0] == 's') {
-            int number = -1;
-            if (isdigit(buffer[1]) != 0) {
-                number = strtol(buffer+1, NULL, 10);
-                if (number < 0 || number > 500000)
-                    number = -1;
-            }
-
-            if (number == -1)
-                printf("Sample number is not valid\n");
-            else {
-                printf("Sample number is %d\n", number);
-                CAPTURE_N_SAMPLES = number;
-            }
-        }
-        else if (buffer[0] == 'g') {
-            break;
-        }
-        else {
-            printf("Unknown command\n");
-            printf("p# - Set the first pin to receive capture data\n");
-            printf("n# - Set how many pins to receive capture data\n");
-            printf("f# - Set the freqency to capture data at in Hz\n");
-            printf("t(1)(0) - Set the trigger to high or low\n");
-            printf("    Trigger happens off first pin\n");
-            printf("s# - Set how many samples to capture\n");
-            printf("g - Go!\n");
-        }
-    }
-}
-
-// Boost the baud rate to try to get the data out faster
-// Probably should just call the init with the baud rate option set
-#undef PICO_DEFAULT_UART_BAUD_RATE
-#define PICO_DEFAULT_UART_BAUD_RATE 921600
-
-#if 0
-int main() {
-    stdio_init_all();
-
-    gpio_init(LED_PIN);
-    gpio_set_dir(LED_PIN, GPIO_OUT);
-
-    uint32_t *capture_buf = 0;
-
-    PIO pio = pio0;
-    uint sm = 0;
-    uint dma_chan = 0;
-
-    while (true) {
-        gpio_put(LED_PIN, 1);
-        sleep_ms(1000);
-        gpio_put(LED_PIN, 0);
-
-        read_user_input();
-
-        uint32_t capture_buf_memory_size = (CAPTURE_PIN_COUNT * CAPTURE_N_SAMPLES + 31) / 32 * sizeof(uint32_t);
-        capture_buf = malloc(capture_buf_memory_size);
-        if (capture_buf == NULL) {
-            printf("Error allocating capture buffer size %d\n", capture_buf_memory_size);
-        }
-
-        logic_analyser_init(pio, sm, CAPTURE_PIN_BASE, CAPTURE_PIN_COUNT, FREQ_DIV);
-
-        uint32_t hz = clock_get_hz(clk_sys);
-        printf("Clock speed is   %d\n", hz);
-        float caphz = (float)hz/FREQ_DIV;
-        printf("Capture speed is %f.2\n", caphz);
-
-        printf("Arming trigger\n");
-        gpio_put(LED_PIN, 1);
-
-        logic_analyser_arm(pio, sm, dma_chan, capture_buf,
-            (CAPTURE_PIN_COUNT * CAPTURE_N_SAMPLES + 31) / 32,
-            CAPTURE_PIN_BASE, TRIGGER);
-
-        dma_channel_wait_for_finish_blocking(dma_chan);
-
-        gpio_put(LED_PIN, 0);
-        print_capture_buf_csv(capture_buf, CAPTURE_PIN_BASE, CAPTURE_PIN_COUNT, CAPTURE_N_SAMPLES);
-
-        pio_remove_program(pio, capture_prog_2, offset);
-
-        free(capture_buf);
-    }
-}
-#endif
