@@ -66,13 +66,13 @@ void logic_analyser_init(PIO pio, uint sm, uint pin_base, uint pin_count, float 
     if( div < 62500.0)  
     {
         load_fast_capture(pio, 8);
-        sm_config_set_wrap(&c, offset, offset);
+        sm_config_set_wrap(&c, offset + fast_in_wrap_target, offset + fast_in_wrap);
     }
     else
     {
         div = div / 2000;
         load_slow_capture(pio);
-        sm_config_set_wrap(&c, offset, offset+7);
+        sm_config_set_wrap(&c, offset + slow_in_wrap_target, offset + slow_in_wrap);
     }
 
 
@@ -98,15 +98,16 @@ void logic_analyser_arm(PIO pio, uint sm, uint dma_chan, uint32_t *capture_buf, 
     channel_config_set_dreq(&c, pio_get_dreq(pio, sm, false));
     channel_config_set_transfer_data_size(&c, DMA_SIZE_32);
 
+    dma_channel_set_irq0_enabled(dma_chan, true);
+    irq_set_exclusive_handler(DMA_IRQ_0, dma_handler);
+    irq_set_enabled(DMA_IRQ_0, true);
+
     dma_channel_configure(dma_chan, &c,
         capture_buf,        // Destinatinon pointer
         &pio->rxf[sm],      // Source pointer
         capture_size_words, // Number of transfers
         true                // Start immediately
     );
-    dma_channel_set_irq0_enabled(dma_chan, true);
-    irq_set_exclusive_handler(DMA_IRQ_0, dma_handler);
-    irq_set_enabled(DMA_IRQ_0, true);
     
     pio_sm_exec(pio, sm, pio_encode_wait_gpio(trigger_level, trigger_pin));
     pio_sm_set_enabled(pio, sm, true);
