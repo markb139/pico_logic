@@ -52,7 +52,17 @@ void load_fast_capture(PIO pio, uint pin_count)
     if(capture_prog_2)
         pio_remove_program(pio, capture_prog_2, offset);
 
-    capture_prog_2 = &fast_in_program;
+    const uint16_t fast_in_program_instructions2[] = {
+        pio_encode_in(pio_pins,pin_count)
+    };
+
+    struct pio_program fast_in_program2 = {
+        .instructions = fast_in_program_instructions2,
+        .length = 1,
+        .origin = -1,
+    };
+
+    capture_prog_2 = &fast_in_program2;
 
     offset = pio_add_program(pio, &fast_in_program);
 }
@@ -65,7 +75,7 @@ void logic_analyser_init(PIO pio, uint sm, uint pin_base, uint pin_count, float 
 
     if( div < 62500.0)  
     {
-        load_fast_capture(pio, 8);
+        load_fast_capture(pio, pin_count);
         sm_config_set_wrap(&c, offset + fast_in_wrap_target, offset + fast_in_wrap);
     }
     else
@@ -88,7 +98,7 @@ void logic_analyser_init(PIO pio, uint sm, uint pin_base, uint pin_count, float 
 }
 
 void logic_analyser_arm(PIO pio, uint sm, uint dma_chan, uint32_t *capture_buf, size_t capture_size_words,
-                        uint trigger_pin, bool trigger_level, irq_handler_t dma_handler) {
+                        uint trigger_pin, uint trigger_type, irq_handler_t dma_handler) {
     pio_sm_set_enabled(pio, sm, false);
     pio_sm_clear_fifos(pio, sm);
 
@@ -108,7 +118,10 @@ void logic_analyser_arm(PIO pio, uint sm, uint dma_chan, uint32_t *capture_buf, 
         capture_size_words, // Number of transfers
         true                // Start immediately
     );
-    
-    pio_sm_exec(pio, sm, pio_encode_wait_gpio(trigger_level, trigger_pin));
+    if(trigger_type == 1)
+        pio_sm_exec(pio, sm, pio_encode_wait_gpio(false, trigger_pin));
+    else if(trigger_type == 2)
+        pio_sm_exec(pio, sm, pio_encode_wait_gpio(true, trigger_pin));
+
     pio_sm_set_enabled(pio, sm, true);
 }

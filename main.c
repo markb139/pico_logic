@@ -32,6 +32,7 @@
 #include "usbtmc_app.h"
 #include "hardware/timer.h"
 #include "pico/stdlib.h"
+
 //--------------------------------------------------------------------+
 // MACRO CONSTANT TYPEDEF PROTYPES
 //--------------------------------------------------------------------+
@@ -49,8 +50,10 @@ enum  {
 
 static uint32_t blink_interval_ms = BLINK_NOT_MOUNTED;
 
+void analyser_task();
+
 void led_blinking_task(void);
-  const uint LED_PIN = 25;
+const uint LED_PIN = 25;
 
 /*------------- MAIN -------------*/
 int main(void)

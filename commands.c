@@ -41,8 +41,8 @@ bool process_command(uint8_t* aData, size_t aLen)
         else
         {
             float sample_div = (float) clock_get_hz(clk_sys) / sample_rate;
-        
-            if(run_analyzer(8, num_samples, pio, sm, pin_base, sample_div, dma_chan,true))
+            uint trigger_pin = pin_base + trig_channel;
+            if(run_analyzer(8, num_samples, pio, sm, pin_base, sample_div, dma_chan,trigger_pin, trig_type))
             {
                 sampleRun = true;
                 commandComplete = false;
@@ -52,6 +52,11 @@ bool process_command(uint8_t* aData, size_t aLen)
     if(aLen >=5 && !strncasecmp("rate ",aData,5))
     {
         sample_rate = atof((char*) aData + 5);
+    }
+    if(aLen >=5 && !strncasecmp("trig ",aData,5))
+    {
+        trig_channel = atof((char*) aData + 5);
+        trig_type = atof((char*) aData + 7);
     }
 
     if(aLen >=5 && !strncasecmp("data?", aData,5))
@@ -86,7 +91,7 @@ void process_esr()
 void analyser_task()
 {}
 
-bool run_analyzer(uint pin_count, uint sample_count, PIO pio, uint sm, uint pin_base, float freq_div, uint dma_chan, bool trigger)
+bool run_analyzer(uint pin_count, uint sample_count, PIO pio, uint sm, uint pin_base, float freq_div, uint dma_chan, uint trigger_pin, uint trigger_type)
 {
     uint32_t word_count = ((pin_count * sample_count) + 31) / 32;
     uint32_t capture_buf_memory_size = word_count * sizeof(uint32_t);
@@ -100,7 +105,7 @@ bool run_analyzer(uint pin_count, uint sample_count, PIO pio, uint sm, uint pin_
     }
     logic_analyser_init(pio, sm, pin_base, pin_count, freq_div);
 
-    logic_analyser_arm(pio, sm, dma_chan, capture_buf+2, word_count, pin_base, trigger, dma_irq);
+    logic_analyser_arm(pio, sm, dma_chan, capture_buf+2, word_count, trigger_pin, trigger_type, dma_irq);
 
     return true;
 }
