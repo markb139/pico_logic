@@ -103,9 +103,9 @@ bool run_analyzer(uint pin_count, uint sample_count, PIO pio, uint sm, uint pin_
     if (capture_buf == NULL) {
         return false;
     }
-    logic_analyser_init(pio, sm, pin_base, pin_count, freq_div);
+    logic_analyser_init(pio, sm, pin_base, pin_count, trigger_pin, trigger_type, freq_div);
 
-    logic_analyser_arm(pio, sm, dma_chan, capture_buf+2, word_count, trigger_pin, trigger_type, dma_irq);
+    logic_analyser_arm(pio, sm, dma_chan, capture_buf+2, word_count, dma_irq);
 
     return true;
 }
