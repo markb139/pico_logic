@@ -41,7 +41,6 @@ struct pio_program *current_program=NULL;
 uint16_t program_instructions[32];
 struct pio_program pio_program;
 
-
 /*******************************************************************************************
  * Initialise the logic analyser program
  * 
@@ -68,7 +67,7 @@ void logic_analyser_init(PIO pio, uint sm, uint pin_base, uint pin_count, uint t
 
     // configure statemachine IN and OUT pins - do we need OUT pins at the moment ?
     sm_config_set_in_pins(&c, pin_base);
-    sm_config_set_out_pins(&c, 25,1);
+    sm_config_set_out_pins(&c, 25, 1);
 
     // configure fifos
     sm_config_set_in_shift(&c, true, true, 32);

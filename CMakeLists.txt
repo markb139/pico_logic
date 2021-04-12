@@ -24,6 +24,7 @@ add_executable(usbtmc
         usb_descriptors.c 
         usbtmc_app.c 
         rp2040-logic-analyzer.c
+        rp2040-logic-generator.c
         commands.c
 )
 

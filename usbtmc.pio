@@ -12,3 +12,31 @@ delay_loop:
     nop [20]
     jmp x-- delay_loop
 .wrap
+
+.program square_wave
+
+.wrap_target
+square_wave:
+    nop [10]
+    set pins, 1
+    nop [10]
+    set pins, 0
+.wrap
+
+.program count
+
+count:
+    pull
+.wrap_target
+    mov x, osr
+loop:
+    mov pins, x
+    jmp x-- loop
+.wrap
+
+.program random
+random:
+.wrap_target
+    pull block
+    out pins, 8
+.wrap

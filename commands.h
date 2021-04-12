@@ -8,6 +8,7 @@ uint32_t* capture_buf = 0;
 uint8_t* esr_buf=0;
 volatile int num_samples = 0;
 volatile float sample_rate = 1000.0;
+volatile uint pattern=0;
 static bool sampleRun;
 static uint32_t status_register;
 uint trig_channel=0;

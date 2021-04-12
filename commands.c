@@ -13,7 +13,6 @@ bool process_command(uint8_t* aData, size_t aLen)
 {
     if(aLen >=4 && !strncasecmp("*idn?", aData,4))
     {
-        led_indicator_pulse();
         command_complete(idn, strlen(idn));
     }
     if(aLen >=4 && !strncasecmp("*opc?", aData,4))
@@ -42,12 +41,20 @@ bool process_command(uint8_t* aData, size_t aLen)
         {
             float sample_div = (float) clock_get_hz(clk_sys) / sample_rate;
             uint trigger_pin = pin_base + trig_channel;
+
+            generate_pattern(pio1, 1, pattern, 1250.0);
+
             if(run_analyzer(8, num_samples, pio, sm, pin_base, sample_div, dma_chan,trigger_pin, trig_type))
             {
                 sampleRun = true;
                 commandComplete = false;
             }
         }
+    }
+    if(aLen >=6 && strncasecmp("l:pat ", aData,6) == 0)
+    {
+        pattern = atof((char*) aData + 6);
+        led_indicator_pulse();
     }
     if(aLen >=5 && !strncasecmp("rate ",aData,5))
     {
@@ -95,14 +102,19 @@ bool run_analyzer(uint pin_count, uint sample_count, PIO pio, uint sm, uint pin_
 {
     uint32_t word_count = ((pin_count * sample_count) + 31) / 32;
     uint32_t capture_buf_memory_size = word_count * sizeof(uint32_t);
-    if(capture_buf)
+    if(capture_buf != NULL)
     {
         free(capture_buf);
+        capture_buf = NULL;
     }
+    
     capture_buf = malloc(8 + capture_buf_memory_size);
+    
     if (capture_buf == NULL) {
         return false;
     }
+    
+
     logic_analyser_init(pio, sm, pin_base, pin_count, trigger_pin, trigger_type, freq_div);
 
     logic_analyser_arm(pio, sm, dma_chan, capture_buf+2, word_count, dma_irq);
