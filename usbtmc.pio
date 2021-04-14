@@ -1,5 +1,6 @@
 .program slow_in
-    wait 1 gpio, 16
+    wait 0 gpio, 15
+    wait 1 gpio, 15
 .wrap_target
 slow_in:
     in pins, 8

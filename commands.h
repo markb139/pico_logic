@@ -1,10 +1,19 @@
 #ifndef __COMMANDS__H__
 #define __COMMANDS__H__
-static const char idn[] = "TinyUSB,ModelNumber,SerialNumber,FirmwareVer123456\r\n";
+
+#ifdef NDEBUG
+    #define MAX_BUFFER_SIZE 50002
+#else
+    #define MAX_BUFFER_SIZE 49002
+#endif
+
+//static const char idn[] = "TinyUSB,ModelNumber,SerialNumber,FirmwareVer123456\r\n";
+static const char idn[] = "Rasp Pico Logic,1.0,1000,v1.0\r\n";
 static const char opc_1[] = "1\r\n";
 static const char opc_0[] = "0\r\n";
 static bool commandComplete;
-uint32_t* capture_buf = 0;
+uint32_t capture_buf[MAX_BUFFER_SIZE];
+
 uint8_t* esr_buf=0;
 volatile int num_samples = 0;
 volatile float sample_rate = 1000.0;

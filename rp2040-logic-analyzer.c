@@ -156,11 +156,11 @@ uint compile_slow_capture(PIO pio, uint pin_count, uint trigger_pin, uint trigge
     program_instructions[prog_offset++] = pio_encode_in(pio_pins, pin_count);
     program_instructions[prog_offset++] = pio_encode_set(pio_x, 19);
     uint jmp_inst = prog_offset;
-    program_instructions[prog_offset++] = pio_encode_delay(20);
-    program_instructions[prog_offset++] = pio_encode_delay(20);
-    program_instructions[prog_offset++] = pio_encode_delay(20);
-    program_instructions[prog_offset++] = pio_encode_delay(20);
-    program_instructions[prog_offset++] = pio_encode_delay(20);
+    program_instructions[prog_offset++] = pio_encode_nop() | pio_encode_delay(20);
+    program_instructions[prog_offset++] = pio_encode_nop() | pio_encode_delay(20);
+    program_instructions[prog_offset++] = pio_encode_nop() | pio_encode_delay(20);
+    program_instructions[prog_offset++] = pio_encode_nop() | pio_encode_delay(20);
+    program_instructions[prog_offset++] = pio_encode_nop() | pio_encode_delay(20);
     program_instructions[prog_offset++] = _pio_encode_instr_and_args(pio_instr_bits_jmp, 2, jmp_inst);
 
     return prog_offset;

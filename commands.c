@@ -54,7 +54,6 @@ bool process_command(uint8_t* aData, size_t aLen)
     if(aLen >=6 && strncasecmp("l:pat ", aData,6) == 0)
     {
         pattern = atof((char*) aData + 6);
-        led_indicator_pulse();
     }
     if(aLen >=5 && !strncasecmp("rate ",aData,5))
     {
@@ -101,20 +100,7 @@ void analyser_task()
 bool run_analyzer(uint pin_count, uint sample_count, PIO pio, uint sm, uint pin_base, float freq_div, uint dma_chan, uint trigger_pin, uint trigger_type)
 {
     uint32_t word_count = ((pin_count * sample_count) + 31) / 32;
-    uint32_t capture_buf_memory_size = word_count * sizeof(uint32_t);
-    if(capture_buf != NULL)
-    {
-        free(capture_buf);
-        capture_buf = NULL;
-    }
-    
-    capture_buf = malloc(8 + capture_buf_memory_size);
-    
-    if (capture_buf == NULL) {
-        return false;
-    }
-    
-
+   
     logic_analyser_init(pio, sm, pin_base, pin_count, trigger_pin, trigger_type, freq_div);
 
     logic_analyser_arm(pio, sm, dma_chan, capture_buf+2, word_count, dma_irq);

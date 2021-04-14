@@ -143,10 +143,10 @@ uint8_t const * tud_descriptor_configuration_cb(uint8_t index)
 char const* string_desc_arr [] =
 {
   (const char[]) { 0x09, 0x04 }, // 0: is supported language is English (0x0409)
-  "MarkB",                     // 1: Manufacturer
-  "Pico Logic",              // 2: Product
+  "MarkB",                       // 1: Manufacturer
+  "Pico Logic",                  // 2: Product
   "123456",                      // 3: Serials, should use chip ID
-  "MarkB USBTMC",              // 4: USBTMC
+  "MarkB USBTMC",                // 4: USBTMC
 };
 
 static uint16_t _desc_str[32];
