@@ -7,7 +7,6 @@
     #define MAX_BUFFER_SIZE 49002
 #endif
 
-//static const char idn[] = "TinyUSB,ModelNumber,SerialNumber,FirmwareVer123456\r\n";
 static const char idn[] = "Rasp Pico Logic,1.0,1000,v1.0\r\n";
 static const char opc_1[] = "1\r\n";
 static const char opc_0[] = "0\r\n";
