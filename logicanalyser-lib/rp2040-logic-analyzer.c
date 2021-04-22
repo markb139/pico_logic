@@ -32,7 +32,7 @@
 #include "hardware/dma.h"
 #include "hardware/irq.h"
 #include "hardware/clocks.h"
-#include "usbtmc.pio.h"
+
 
 uint compile_capture(PIO pio, pio_sm_config *c, uint pin_count, uint trigger_pin, uint trigger_type, float div);
 

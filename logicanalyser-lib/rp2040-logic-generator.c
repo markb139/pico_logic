@@ -12,7 +12,8 @@
 #include "hardware/pio.h"
 #include "hardware/dma.h"
 #include "hardware/irq.h"
-#include "usbtmc.pio.h"
+#include "logic_analyser.pio.h"
+
 
 #define GEN_DMA_CHAN 1
 
