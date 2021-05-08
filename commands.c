@@ -1,79 +1,62 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>   
-#include "hardware/pio.h"
 #include "hardware/dma.h"
 #include "hardware/clocks.h"
+#include "logic_analyser.h"
 #include "main.h"
 #include "commands.h"
 
 static inline uint32_t tu_max32 (uint32_t x, uint32_t y) { return (x > y) ? x : y; }
+void dma_irq();
+
+#define PIN_BASE 0
+
+#define _CMD(_CMD_STR, _STR_LEN, _FUNC) \
+    if(aLen >=_STR_LEN && !strncasecmp(_CMD_STR, aData,_STR_LEN)) \
+        _FUNC(aData, aLen);
 
 bool process_command(uint8_t* aData, size_t aLen)
 {
-    if(aLen >=4 && !strncasecmp("*idn?", aData,4))
-    {
-        command_complete(idn, strlen(idn));
-    }
-    if(aLen >=4 && !strncasecmp("*opc?", aData,4))
-    {
-        process_opc();
-    }
-    if(aLen >=4 && !strncasecmp("*esr?", aData,4))
-    {
-        process_esr();
-    }
-    if(aLen >=9 && strncasecmp("l:capture ", aData,9) == 0)
-    {
-        PIO pio = pio0;
-        uint sm = 0;
-        uint dma_chan = 0;
-        uint pin_base = 15;
+    _CMD("*idn?", 4, process_idn);
+    _CMD("*opc?", 4, process_opc);
+    _CMD("*esr?", 4, process_esr);
+    _CMD("l:capture", 9, process_capture);
+    _CMD("l:pat", 5, process_pattern);
+    _CMD("rate", 4, process_rate);
+    _CMD("trig", 4, process_trigger);
+    _CMD("data?", 5, process_data);
 
-        num_samples = tu_max32(atoi((char*)aData + 10), 1);
-        if(num_samples > 200000)
-        {
-            commandComplete = true;
-            sampleRun = false;
-            status_register |= 0x00000001;
-        }
-        else
-        {
-            float sample_div = (float) clock_get_hz(clk_sys) / sample_rate;
-            uint trigger_pin = pin_base + trig_channel;
-
-            generate_pattern(pio1, 1, pattern, 1250.0);
-
-            if(run_analyzer(8, num_samples, pio, sm, pin_base, sample_div, dma_chan,trigger_pin, trig_type))
-            {
-                sampleRun = true;
-                commandComplete = false;
-            }
-        }
-    }
-    if(aLen >=6 && strncasecmp("l:pat ", aData,6) == 0)
-    {
-        pattern = atof((char*) aData + 6);
-    }
-    if(aLen >=5 && !strncasecmp("rate ",aData,5))
-    {
-        sample_rate = atof((char*) aData + 5);
-    }
-    if(aLen >=5 && !strncasecmp("trig ",aData,5))
-    {
-        trig_channel = atof((char*) aData + 5);
-        trig_type = atof((char*) aData + 7);
-    }
-
-    if(aLen >=5 && !strncasecmp("data?", aData,5))
-    {
-        process_capture_result();
-    }
-    
     return true;
 }
 
-void process_opc()
+void process_idn(uint8_t const *aBuffer, size_t aLen)
+{
+    command_complete(idn, strlen(idn));
+}
+
+void process_pattern(uint8_t const *aBuffer, size_t aLen)
+{
+    pattern = atof((char*) aBuffer + 6);
+}
+
+void process_rate(uint8_t const *aBuffer, size_t aLen)
+{
+    sample_rate = atof((char*) aBuffer + 5);
+}
+
+void process_trigger(uint8_t const *aBuffer, size_t aLen)
+{
+    trig_channel = atof((char*) aBuffer + 5);
+    trig_type = atof((char*) aBuffer + 7);
+}
+
+void process_data(uint8_t const *aBuffer, size_t aLen)
+{
+        process_capture_result();
+}
+
+void process_opc(uint8_t const *aBuffer, size_t aLen)
 {
     if(commandComplete)
         command_complete(opc_1, strlen(opc_1));
@@ -81,7 +64,7 @@ void process_opc()
         command_complete(opc_0, strlen(opc_0));
 }
 
-void process_esr()
+void process_esr(uint8_t const *aBuffer, size_t aLen)
 {
     if(esr_buf)
     {
@@ -92,6 +75,36 @@ void process_esr()
     sprintf(esr_buf, "%d\r\n", status_register);
     command_complete(esr_buf, strlen(esr_buf));
     status_register = 0;
+}
+
+void process_capture(uint8_t const *aData, size_t aLen)
+{
+    PIO pio = pio0;
+    uint sm = 0;
+    uint dma_chan = 0;
+    uint pin_base = PIN_BASE;
+
+    num_samples = tu_max32(atoi((char*)aData + 10), 1);
+    if(num_samples > 200000)
+    {
+        commandComplete = true;
+        sampleRun = false;
+        status_register |= 0x00000001;
+    }
+    else
+    {
+        float sample_div = (float) clock_get_hz(clk_sys) / sample_rate;
+        uint trigger_pin = pin_base + trig_channel;
+
+        generate_pattern(pio1, 1, pattern, 1250.0);
+
+        if(run_analyzer(8, num_samples, pio, sm, pin_base, sample_div, dma_chan,trigger_pin, trig_type))
+        {
+            sampleRun = true;
+            commandComplete = false;
+        }
+    }
+
 }
 
 void analyser_task()

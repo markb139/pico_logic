@@ -24,8 +24,15 @@ uint trig_type=0;
 
 bool command_complete(uint8_t const *aBuffer, size_t aLen);
 void process_capture_result();
-void process_opc();
-void process_esr();
+void process_idn(uint8_t const *aBuffer, size_t aLen);
+void process_opc(uint8_t const *aBuffer, size_t aLen);
+void process_esr(uint8_t const *aBuffer, size_t aLen);
+void process_capture(uint8_t const *aBuffer, size_t aLen);
+void process_pattern(uint8_t const *aBuffer, size_t aLen);
+void process_rate(uint8_t const *aBuffer, size_t aLen);
+void process_trigger(uint8_t const *aBuffer, size_t aLen);
+void process_data(uint8_t const *aBuffer, size_t aLen);
 void analyser_task();
 bool run_analyzer(uint pin_count, uint sample_count, PIO pio, uint sm, uint pin_base, float freq_div, uint dma_chan, uint trigger_pin, uint trigger_type);
+
 #endif

@@ -16,6 +16,11 @@ target_sources(logic_analyser INTERFACE
     ${CMAKE_CURRENT_LIST_DIR}/rp2040-logic-analyzer.c
     ${CMAKE_CURRENT_LIST_DIR}/rp2040-logic-generator.c
 )
+target_include_directories(logic_analyser 
+    INTERFACE 
+        $<INSTALL_INTERFACE:include>    
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+)
 
 target_link_libraries(logic_analyser INTERFACE
     pico_stdlib
