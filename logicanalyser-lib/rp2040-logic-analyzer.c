@@ -62,13 +62,18 @@ void logic_analyser_init(PIO pio, uint sm, uint pin_base, uint pin_count, uint t
     if(current_program)
         pio_remove_program(pio, current_program, offset);
 
+    pio_gpio_init(pio, 16);
+    sm_config_set_sideset(&c, 1, false, false);
+    pio_sm_set_consecutive_pindirs(pio, sm, 16, 1, true);
+    
     // compile and load PIO capture program
     offset = compile_capture(pio, &c, pin_count, trigger_pin, trigger_type, div);
 
     // configure statemachine IN and OUT pins - do we need OUT pins at the moment ?
     sm_config_set_in_pins(&c, pin_base);
     sm_config_set_out_pins(&c, 25, 1);
-
+    sm_config_set_sideset_pins(&c, 16);
+    
     // configure fifos
     sm_config_set_in_shift(&c, true, true, 32);
     sm_config_set_fifo_join(&c, PIO_FIFO_JOIN_RX);
@@ -126,12 +131,12 @@ uint8_t add_edge_trigger(bool edge, uint trigger_pin, uint16_t* program, uint8_t
 {
     if(edge)
     {
-        program[prog_offset] = pio_encode_wait_gpio(false, trigger_pin);
+        program[prog_offset] = pio_encode_wait_gpio(false, trigger_pin)  | pio_encode_sideset(1,1);
         program[prog_offset+1] = pio_encode_wait_gpio(true, trigger_pin);
     }
     else
     {
-        program[prog_offset] = pio_encode_wait_gpio(true, trigger_pin);
+        program[prog_offset] = pio_encode_wait_gpio(true, trigger_pin) | pio_encode_sideset(1,1);
         program[prog_offset+1] = pio_encode_wait_gpio(false, trigger_pin);
     }
     
@@ -143,6 +148,7 @@ uint compile_slow_capture(PIO pio, uint pin_count, uint trigger_pin, uint trigge
 {
     uint8_t prog_offset = 0;
     if(trigger_type == 1 || trigger_type == 2)
+
     {
         bool hi_level = trigger_type == 2 ? true: false;
         prog_offset = add_level_trigger(hi_level, trigger_pin, program_instructions, 0);
@@ -153,7 +159,7 @@ uint compile_slow_capture(PIO pio, uint pin_count, uint trigger_pin, uint trigge
         prog_offset = add_edge_trigger(hi_level, trigger_pin, program_instructions, 0);
     }
 
-    program_instructions[prog_offset++] = pio_encode_in(pio_pins, pin_count);
+    program_instructions[prog_offset++] = pio_encode_in(pio_pins, pin_count) | pio_encode_sideset(1,0);
     program_instructions[prog_offset++] = pio_encode_set(pio_x, 19);
     uint jmp_inst = prog_offset;
     program_instructions[prog_offset++] = pio_encode_nop() | pio_encode_delay(20);
@@ -180,7 +186,7 @@ uint compile_fast_capture(PIO pio, uint pin_count, uint trigger_pin, uint trigge
         prog_offset = add_edge_trigger(hi_level, trigger_pin, program_instructions, 0);
     }
 
-    program_instructions[prog_offset++] =  pio_encode_in(pio_pins,pin_count);
+    program_instructions[prog_offset++] =  pio_encode_in(pio_pins,pin_count)  | pio_encode_sideset(1,0);
 
     return prog_offset;
 }

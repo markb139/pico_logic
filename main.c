@@ -61,9 +61,7 @@ int main(void)
   board_init();
   gpio_init(LED_PIN);
   gpio_set_dir(LED_PIN, GPIO_OUT);
-  gpio_init(13);
-  gpio_set_dir(13, GPIO_OUT);
-  
+
   tusb_init();
 
   while (1)
@@ -141,7 +139,6 @@ void led_blinking_task(void)
       }
       led_state = false;
       gpio_put(LED_PIN, 0);
-//      doPulse = true;
     }
   }
   else
