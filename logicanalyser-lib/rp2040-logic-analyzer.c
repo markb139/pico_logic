@@ -62,17 +62,11 @@ void logic_analyser_init(PIO pio, uint sm, uint pin_base, uint pin_count, uint t
     if(current_program)
         pio_remove_program(pio, current_program, offset);
 
-    pio_gpio_init(pio, 16);
-    sm_config_set_sideset(&c, 1, false, false);
-    pio_sm_set_consecutive_pindirs(pio, sm, 16, 1, true);
-    
     // compile and load PIO capture program
     offset = compile_capture(pio, &c, pin_count, trigger_pin, trigger_type, div);
 
-    // configure statemachine IN and OUT pins - do we need OUT pins at the moment ?
+    // configure statemachine IN pins
     sm_config_set_in_pins(&c, pin_base);
-    sm_config_set_out_pins(&c, 25, 1);
-    sm_config_set_sideset_pins(&c, 16);
     
     // configure fifos
     sm_config_set_in_shift(&c, true, true, 32);

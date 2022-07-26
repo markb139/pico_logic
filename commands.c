@@ -9,8 +9,9 @@
 
 static inline uint32_t tu_max32 (uint32_t x, uint32_t y) { return (x > y) ? x : y; }
 void dma_irq();
+uint dma_chan;
 
-#define PIN_BASE 0
+#define PIN_BASE 2
 
 #define _CMD(_CMD_STR, _STR_LEN, _FUNC) \
     if(aLen >=_STR_LEN && !strncasecmp(_CMD_STR, aData,_STR_LEN)) \
@@ -81,7 +82,6 @@ void process_capture(uint8_t const *aData, size_t aLen)
 {
     PIO pio = pio0;
     uint sm = 0;
-    uint dma_chan = 0;
     uint pin_base = PIN_BASE;
 
     num_samples = tu_max32(atoi((char*)aData + 10), 1);
@@ -95,10 +95,10 @@ void process_capture(uint8_t const *aData, size_t aLen)
     {
         float sample_div = (float) clock_get_hz(clk_sys) / sample_rate;
         uint trigger_pin = pin_base + trig_channel;
-
         generate_pattern(pio1, 1, pattern, 1250.0);
-
-        if(run_analyzer(8, num_samples, pio, sm, pin_base, sample_div, dma_chan,trigger_pin, trig_type))
+        dma_chan = 2; //dma_claim_unused_channel (true);
+        printf("DMA channel %d\n",dma_chan);
+        if(run_analyzer(8, num_samples, pio, sm, pin_base, sample_div, dma_chan, trigger_pin, trig_type))
         {
             sampleRun = true;
             commandComplete = false;
@@ -123,7 +123,7 @@ bool run_analyzer(uint pin_count, uint sample_count, PIO pio, uint sm, uint pin_
 
 void dma_irq()
 {
-  dma_hw->ints0 = 1u << 0;
+  dma_hw->ints0 = 1u << dma_chan;
   commandComplete = true;
   sampleRun = false;
 }

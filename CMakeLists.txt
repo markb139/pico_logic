@@ -1,13 +1,15 @@
 # Generated Cmake Pico project file
 
-cmake_minimum_required(VERSION 3.12)
+cmake_minimum_required(VERSION 3.13)
 
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD 17)
 
+set(PICO_BOARD "pico_w")
+
 # initalize pico_sdk from installed location
 # (note this can come from environment, CMake cache etc)
-set(PICO_SDK_PATH /home/pi/pico/pico/pico-sdk)
+set(PICO_SDK_PATH "/home/pi/pico/pico-sdk")
 
 # Pull in Pico SDK (must be before project)
 include(pico_sdk_import.cmake)
@@ -46,3 +48,38 @@ target_link_libraries(usbtmc
 )
 
 pico_add_extra_outputs(usbtmc)
+
+##################################################################
+
+project(vxitmc C CXX)
+
+
+# Add executable. Default name is the project name, version 0.1
+add_executable(vxitmc 
+        main_vxi.c
+        commands.c
+        rpc_server.c
+        vxi_core_prog.c
+        eeprom_24lc02b.c
+)
+
+target_include_directories(vxitmc PRIVATE ${CMAKE_CURRENT_LIST_DIR})
+
+pico_set_program_name(vxitmc "vxitmc")
+pico_set_program_version(vxitmc "0.1")
+
+pico_enable_stdio_uart(vxitmc 1)
+pico_enable_stdio_usb(vxitmc 0)
+
+target_link_libraries(vxitmc 
+                pico_stdlib
+                hardware_timer
+                hardware_dma
+                hardware_i2c
+                tinyusb_device 
+                tinyusb_board
+                logic_analyser
+                pico_cyw43_arch_lwip_poll
+                pico_lwip_mdns
+)
+pico_add_extra_outputs(vxitmc)

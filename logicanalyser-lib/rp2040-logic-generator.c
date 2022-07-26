@@ -25,6 +25,8 @@ typedef struct {
     uint32_t random_buf[32];
     bool dma_conf;
     bool random_run;
+    uint pin_base;
+    uint pin_count;
     dma_channel_config dma_c;
 } Generator;
 
@@ -39,6 +41,8 @@ void generator_initialise(PIO pio, uint sm)
     generator->random_run = false;
     generator->pio = pio;
     generator->state_machine = sm;
+    generator->pin_base = 10;
+    generator->pin_count = 8;
     generator->dma_c = dma_channel_get_default_config(GEN_DMA_CHAN);
     channel_config_set_read_increment(&generator->dma_c, true);
     channel_config_set_write_increment(&generator->dma_c, false);
@@ -94,9 +98,9 @@ void generate_pattern(PIO pio, uint sm, uint pattern, float div)
         generator->generator_current_program = &square_wave_program;
         generator->generator_offset = pio_add_program(pio, &square_wave_program);
         pio_sm_config c = square_wave_program_get_default_config(generator->generator_offset);
-        sm_config_set_set_pins(&c, 0, 1);
-        pio_gpio_init(pio, 0);
-        pio_sm_set_consecutive_pindirs(pio, sm, 0, 1, true);
+        sm_config_set_set_pins(&c, generator->pin_base, 1);
+        pio_gpio_init(pio, generator->pin_base);
+        pio_sm_set_consecutive_pindirs(pio, sm, generator->pin_base, 1, true);
 
         sm_config_set_clkdiv(&c, div);
         pio_sm_init(pio, sm, generator->generator_offset, &c);
@@ -104,15 +108,17 @@ void generate_pattern(PIO pio, uint sm, uint pattern, float div)
     }
     else if(pattern == 2)
     {
+        for(int i=generator->pin_base;i<generator->pin_base + generator->pin_count;i++)
+            pio_gpio_init(pio, i);
+        
+        pio_sm_set_consecutive_pindirs(pio, sm, generator->pin_base, generator->pin_count, true);
+
         generator->generator_current_program = &count_program;
         generator->generator_offset = pio_add_program(pio, &count_program);
         pio_sm_config c = count_program_get_default_config(generator->generator_offset);
-        sm_config_set_out_pins(&c, 0, 8);
-        for(int i =0;i<8;i++)
-            pio_gpio_init(pio, i);
-
-        pio_sm_set_consecutive_pindirs(pio, sm, 0, 8, true);
-
+        
+        sm_config_set_out_pins(&c, generator->pin_base, generator->pin_count);
+        
         sm_config_set_clkdiv(&c, div);
         pio_sm_init(pio, sm, generator->generator_offset, &c);
         pio_sm_put_blocking(pio, sm, 0xffffffff);
@@ -123,12 +129,12 @@ void generate_pattern(PIO pio, uint sm, uint pattern, float div)
         generator->generator_current_program = &random_program;
         generator->generator_offset = pio_add_program(pio, &random_program);
         pio_sm_config c = random_program_get_default_config(generator->generator_offset);
-        sm_config_set_out_pins(&c, 0, 8);
+        sm_config_set_out_pins(&c, generator->pin_base, generator->pin_count);
         
-        for(int i=0;i<8;i++)
+        for(int i=generator->pin_base;i<generator->pin_base+generator->pin_count; i++)
             pio_gpio_init(pio, i);
 
-        pio_sm_set_consecutive_pindirs(pio, sm, 0, 8, true);
+        pio_sm_set_consecutive_pindirs(pio, sm, generator->pin_base, generator->pin_count, true);
 
         sm_config_set_clkdiv(&c, div);
         pio_sm_init(pio, sm, generator->generator_offset, &c);

@@ -4,10 +4,10 @@
 #ifdef NDEBUG
     #define MAX_BUFFER_SIZE 50002
 #else
-    #define MAX_BUFFER_SIZE 49002
+    #define MAX_BUFFER_SIZE 50002
 #endif
 
-static const char idn[] = "Rasp Pico Logic,1.0,1000,v1.0\r\n";
+static const char idn[] = "Rasp Pico Logic,1.0,1001,v1.0\r\n";
 static const char opc_1[] = "1\r\n";
 static const char opc_0[] = "0\r\n";
 static bool commandComplete;

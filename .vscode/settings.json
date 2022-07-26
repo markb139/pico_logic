@@ -19,6 +19,10 @@
     "cmake.buildBeforeRun": true,
     "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
     "files.associations": {
-        "pwm.h": "c"
-    }
+        "pwm.h": "c",
+        "netif.h": "c",
+        "mdns.h": "c",
+        "logic_analyser.pio.h": "c"
+    },
+    "cortex-debug.variableUseNaturalFormat": false
 }

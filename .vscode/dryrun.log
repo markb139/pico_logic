@@ -1,0 +1,114 @@
+make --dry-run --always-make --keep-going --print-directory
+make: Entering directory '/home/pi/pico/pico_logic'
+/usr/bin/cmake -S/home/pi/pico/pico_logic -B/home/pi/pico/pico_logic --check-build-system CMakeFiles/Makefile.cmake 0
+/usr/bin/cmake -E cmake_progress_start /home/pi/pico/pico_logic/CMakeFiles /home/pi/pico/pico_logic//CMakeFiles/progress.marks
+make -s -f CMakeFiles/Makefile2 all
+make[1]: Entering directory '/home/pi/pico/pico_logic'
+make -s -f pico-sdk/src/rp2_common/cyw43_driver/CMakeFiles/PioasmBuild.dir/build.make pico-sdk/src/rp2_common/cyw43_driver/CMakeFiles/PioasmBuild.dir/depend
+make[2]: Entering directory '/home/pi/pico/pico_logic'
+cd /home/pi/pico/pico_logic && /usr/bin/cmake -E cmake_depends "Unix Makefiles" /home/pi/pico/pico_logic /home/pi/pico/pico-sdk/src/rp2_common/cyw43_driver /home/pi/pico/pico_logic /home/pi/pico/pico_logic/pico-sdk/src/rp2_common/cyw43_driver /home/pi/pico/pico_logic/pico-sdk/src/rp2_common/cyw43_driver/CMakeFiles/PioasmBuild.dir/DependInfo.cmake --color=
+make[2]: Leaving directory '/home/pi/pico/pico_logic'
+make -s -f pico-sdk/src/rp2_common/cyw43_driver/CMakeFiles/PioasmBuild.dir/build.make pico-sdk/src/rp2_common/cyw43_driver/CMakeFiles/PioasmBuild.dir/build
+make[2]: Entering directory '/home/pi/pico/pico_logic'
+/usr/bin/cmake -E cmake_echo_color --switch= --blue --bold --progress-dir=/home/pi/pico/pico_logic/CMakeFiles --progress-num=4 "Creating directories for 'PioasmBuild'"
+cd /home/pi/pico/pico_logic/pico-sdk/src/rp2_common/cyw43_driver && /usr/bin/cmake -E make_directory /home/pi/pico/pico-sdk/tools/pioasm
+cd /home/pi/pico/pico_logic/pico-sdk/src/rp2_common/cyw43_driver && /usr/bin/cmake -E make_directory /home/pi/pico/pico_logic/pioasm
+cd /home/pi/pico/pico_logic/pico-sdk/src/rp2_common/cyw43_driver && /usr/bin/cmake -E make_directory /home/pi/pico/pico_logic/pico-sdk/src/rp2_common/cyw43_driver/pioasm
+cd /home/pi/pico/pico_logic/pico-sdk/src/rp2_common/cyw43_driver && /usr/bin/cmake -E make_directory /home/pi/pico/pico_logic/pico-sdk/src/rp2_common/cyw43_driver/pioasm/tmp
+cd /home/pi/pico/pico_logic/pico-sdk/src/rp2_common/cyw43_driver && /usr/bin/cmake -E make_directory /home/pi/pico/pico_logic/pico-sdk/src/rp2_common/cyw43_driver/pioasm/src/PioasmBuild-stamp
+cd /home/pi/pico/pico_logic/pico-sdk/src/rp2_common/cyw43_driver && /usr/bin/cmake -E make_directory /home/pi/pico/pico_logic/pico-sdk/src/rp2_common/cyw43_driver/pioasm/src
+cd /home/pi/pico/pico_logic/pico-sdk/src/rp2_common/cyw43_driver && /usr/bin/cmake -E make_directory /home/pi/pico/pico_logic/pico-sdk/src/rp2_common/cyw43_driver/pioasm/src/PioasmBuild-stamp
+cd /home/pi/pico/pico_logic/pico-sdk/src/rp2_common/cyw43_driver && /usr/bin/cmake -E touch /home/pi/pico/pico_logic/pico-sdk/src/rp2_common/cyw43_driver/pioasm/src/PioasmBuild-stamp/PioasmBuild-mkdir
+/usr/bin/cmake -E cmake_echo_color --switch= --blue --bold --progress-dir=/home/pi/pico/pico_logic/CMakeFiles --progress-num= "No download step for 'PioasmBuild'"
+cd /home/pi/pico/pico_logic/pico-sdk/src/rp2_common/cyw43_driver && /usr/bin/cmake -E echo_append
+cd /home/pi/pico/pico_logic/pico-sdk/src/rp2_common/cyw43_driver && /usr/bin/cmake -E touch /home/pi/pico/pico_logic/pico-sdk/src/rp2_common/cyw43_driver/pioasm/src/PioasmBuild-stamp/PioasmBuild-download
+/usr/bin/cmake -E cmake_echo_color --switch= --blue --bold --progress-dir=/home/pi/pico/pico_logic/CMakeFiles --progress-num= "No update step for 'PioasmBuild'"
+cd /home/pi/pico/pico_logic/pico-sdk/src/rp2_common/cyw43_driver && /usr/bin/cmake -E echo_append
+cd /home/pi/pico/pico_logic/pico-sdk/src/rp2_common/cyw43_driver && /usr/bin/cmake -E touch /home/pi/pico/pico_logic/pico-sdk/src/rp2_common/cyw43_driver/pioasm/src/PioasmBuild-stamp/PioasmBuild-update
+/usr/bin/cmake -E cmake_echo_color --switch= --blue --bold --progress-dir=/home/pi/pico/pico_logic/CMakeFiles --progress-num=5 "No patch step for 'PioasmBuild'"
+cd /home/pi/pico/pico_logic/pico-sdk/src/rp2_common/cyw43_driver && /usr/bin/cmake -E echo_append
+cd /home/pi/pico/pico_logic/pico-sdk/src/rp2_common/cyw43_driver && /usr/bin/cmake -E touch /home/pi/pico/pico_logic/pico-sdk/src/rp2_common/cyw43_driver/pioasm/src/PioasmBuild-stamp/PioasmBuild-patch
+/usr/bin/cmake -E cmake_echo_color --switch= --blue --bold --progress-dir=/home/pi/pico/pico_logic/CMakeFiles --progress-num= "Performing configure step for 'PioasmBuild'"
+cd /home/pi/pico/pico_logic/pioasm && /usr/bin/cmake "-GUnix Makefiles" -C/home/pi/pico/pico_logic/pico-sdk/src/rp2_common/cyw43_driver/pioasm/tmp/PioasmBuild-cache-Release.cmake /home/pi/pico/pico-sdk/tools/pioasm
+cd /home/pi/pico/pico_logic/pioasm && /usr/bin/cmake -E touch /home/pi/pico/pico_logic/pico-sdk/src/rp2_common/cyw43_driver/pioasm/src/PioasmBuild-stamp/PioasmBuild-configure
+/usr/bin/cmake -E cmake_echo_color --switch= --blue --bold --progress-dir=/home/pi/pico/pico_logic/CMakeFiles --progress-num= "Performing build step for 'PioasmBuild'"
+cd /home/pi/pico/pico_logic/pioasm && make
+make[3]: Entering directory '/home/pi/pico/pico_logic/pioasm'
+make[3]: Leaving directory '/home/pi/pico/pico_logic/pioasm'
+make[2]: Leaving directory '/home/pi/pico/pico_logic'
+make -s -f CMakeFiles/ELF2UF2Build.dir/build.make CMakeFiles/ELF2UF2Build.dir/depend
+make[2]: Entering directory '/home/pi/pico/pico_logic'
+cd /home/pi/pico/pico_logic && /usr/bin/cmake -E cmake_depends "Unix Makefiles" /home/pi/pico/pico_logic /home/pi/pico/pico_logic /home/pi/pico/pico_logic /home/pi/pico/pico_logic /home/pi/pico/pico_logic/CMakeFiles/ELF2UF2Build.dir/DependInfo.cmake --color=
+make[2]: Leaving directory '/home/pi/pico/pico_logic'
+make -s -f CMakeFiles/ELF2UF2Build.dir/build.make CMakeFiles/ELF2UF2Build.dir/build
+make[2]: Entering directory '/home/pi/pico/pico_logic'
+/usr/bin/cmake -E cmake_echo_color --switch= --blue --bold --progress-dir=/home/pi/pico/pico_logic/CMakeFiles --progress-num=1 "Creating directories for 'ELF2UF2Build'"
+/usr/bin/cmake -E make_directory /home/pi/pico/pico-sdk/tools/elf2uf2
+/usr/bin/cmake -E make_directory /home/pi/pico/pico_logic/elf2uf2
+/usr/bin/cmake -E make_directory /home/pi/pico/pico_logic/elf2uf2
+/usr/bin/cmake -E make_directory /home/pi/pico/pico_logic/elf2uf2/tmp
+/usr/bin/cmake -E make_directory /home/pi/pico/pico_logic/elf2uf2/src/ELF2UF2Build-stamp
+/usr/bin/cmake -E make_directory /home/pi/pico/pico_logic/elf2uf2/src
+/usr/bin/cmake -E make_directory /home/pi/pico/pico_logic/elf2uf2/src/ELF2UF2Build-stamp
+/usr/bin/cmake -E touch /home/pi/pico/pico_logic/elf2uf2/src/ELF2UF2Build-stamp/ELF2UF2Build-mkdir
+/usr/bin/cmake -E cmake_echo_color --switch= --blue --bold --progress-dir=/home/pi/pico/pico_logic/CMakeFiles --progress-num= "No download step for 'ELF2UF2Build'"
+/usr/bin/cmake -E echo_append
+/usr/bin/cmake -E touch /home/pi/pico/pico_logic/elf2uf2/src/ELF2UF2Build-stamp/ELF2UF2Build-download
+/usr/bin/cmake -E cmake_echo_color --switch= --blue --bold --progress-dir=/home/pi/pico/pico_logic/CMakeFiles --progress-num= "No update step for 'ELF2UF2Build'"
+/usr/bin/cmake -E echo_append
+/usr/bin/cmake -E touch /home/pi/pico/pico_logic/elf2uf2/src/ELF2UF2Build-stamp/ELF2UF2Build-update
+/usr/bin/cmake -E cmake_echo_color --switch= --blue --bold --progress-dir=/home/pi/pico/pico_logic/CMakeFiles --progress-num=2 "No patch step for 'ELF2UF2Build'"
+/usr/bin/cmake -E echo_append
+/usr/bin/cmake -E touch /home/pi/pico/pico_logic/elf2uf2/src/ELF2UF2Build-stamp/ELF2UF2Build-patch
+/usr/bin/cmake -E cmake_echo_color --switch= --blue --bold --progress-dir=/home/pi/pico/pico_logic/CMakeFiles --progress-num= "Performing configure step for 'ELF2UF2Build'"
+cd /home/pi/pico/pico_logic/elf2uf2 && /usr/bin/cmake "-GUnix Makefiles" /home/pi/pico/pico-sdk/tools/elf2uf2
+cd /home/pi/pico/pico_logic/elf2uf2 && /usr/bin/cmake -E touch /home/pi/pico/pico_logic/elf2uf2/src/ELF2UF2Build-stamp/ELF2UF2Build-configure
+/usr/bin/cmake -E cmake_echo_color --switch= --blue --bold --progress-dir=/home/pi/pico/pico_logic/CMakeFiles --progress-num= "Performing build step for 'ELF2UF2Build'"
+cd /home/pi/pico/pico_logic/elf2uf2 && make
+make[3]: Entering directory '/home/pi/pico/pico_logic/elf2uf2'
+make[3]: Leaving directory '/home/pi/pico/pico_logic/elf2uf2'
+make[2]: Leaving directory '/home/pi/pico/pico_logic'
+make -s -f pico-sdk/src/rp2_common/boot_stage2/CMakeFiles/bs2_default.dir/build.make pico-sdk/src/rp2_common/boot_stage2/CMakeFiles/bs2_default.dir/depend
+make[2]: Entering directory '/home/pi/pico/pico_logic'
+cd /home/pi/pico/pico_logic && /usr/bin/cmake -E cmake_depends "Unix Makefiles" /home/pi/pico/pico_logic /home/pi/pico/pico-sdk/src/rp2_common/boot_stage2 /home/pi/pico/pico_logic /home/pi/pico/pico_logic/pico-sdk/src/rp2_common/boot_stage2 /home/pi/pico/pico_logic/pico-sdk/src/rp2_common/boot_stage2/CMakeFiles/bs2_default.dir/DependInfo.cmake --color=
+make[2]: Leaving directory '/home/pi/pico/pico_logic'
+make -s -f pico-sdk/src/rp2_common/boot_stage2/CMakeFiles/bs2_default.dir/build.make pico-sdk/src/rp2_common/boot_stage2/CMakeFiles/bs2_default.dir/build
+make[2]: Entering directory '/home/pi/pico/pico_logic'
+/usr/bin/cmake -E cmake_echo_color --switch= --green --progress-dir=/home/pi/pico/pico_logic/CMakeFiles --progress-num=6 "Building ASM object pico-sdk/src/rp2_common/boot_stage2/CMakeFiles/bs2_default.dir/compile_time_choice.S.o"
+cd /home/pi/pico/pico_logic/pico-sdk/src/rp2_common/boot_stage2 && /usr/bin/cc -DPICO_BOARD=\"pico_w\" -DPICO_BUILD=1 -DPICO_NO_HARDWARE=0 -DPICO_ON_DEVICE=1 -I/home/pi/pico/pico-sdk/src/rp2_common/boot_stage2/asminclude -I/home/pi/pico/pico-sdk/src/rp2040/hardware_regs/include -I/home/pi/pico/pico-sdk/src/rp2_common/hardware_base/include -I/home/pi/pico/pico-sdk/src/common/pico_base/include -I/home/pi/pico/pico_logic/generated/pico_base -I/home/pi/pico/pico-sdk/src/boards/include -I/home/pi/pico/pico-sdk/src/rp2_common/pico_platform/include -I/home/pi/pico/pico-sdk/src/rp2_common/boot_stage2/include -O3 -DNDEBUG -o CMakeFiles/bs2_default.dir/compile_time_choice.S.o -c /home/pi/pico/pico-sdk/src/rp2_common/boot_stage2/compile_time_choice.S
+/usr/bin/cmake -E cmake_echo_color --switch= --green --bold --progress-dir=/home/pi/pico/pico_logic/CMakeFiles --progress-num= "Linking ASM executable bs2_default.elf"
+cd /home/pi/pico/pico_logic/pico-sdk/src/rp2_common/boot_stage2 && /usr/bin/cmake -E cmake_link_script CMakeFiles/bs2_default.dir/link.txt --verbose=
+cd /home/pi/pico/pico_logic/pico-sdk/src/rp2_common/boot_stage2 && /usr/bin/objdump -h /home/pi/pico/pico_logic/pico-sdk/src/rp2_common/boot_stage2/bs2_default.elf >bs2_default.dis
+cd /home/pi/pico/pico_logic/pico-sdk/src/rp2_common/boot_stage2 && /usr/bin/objdump -d /home/pi/pico/pico_logic/pico-sdk/src/rp2_common/boot_stage2/bs2_default.elf >>bs2_default.dis
+make[2]: Leaving directory '/home/pi/pico/pico_logic'
+/usr/bin/cmake -E cmake_echo_color --switch= --progress-dir=/home/pi/pico/pico_logic/CMakeFiles --progress-num=6 "Built target bs2_default"
+make -s -f pico-sdk/src/rp2_common/boot_stage2/CMakeFiles/bs2_default_padded_checksummed_asm.dir/build.make pico-sdk/src/rp2_common/boot_stage2/CMakeFiles/bs2_default_padded_checksummed_asm.dir/depend
+make[2]: Entering directory '/home/pi/pico/pico_logic'
+cd /home/pi/pico/pico_logic && /usr/bin/cmake -E cmake_depends "Unix Makefiles" /home/pi/pico/pico_logic /home/pi/pico/pico-sdk/src/rp2_common/boot_stage2 /home/pi/pico/pico_logic /home/pi/pico/pico_logic/pico-sdk/src/rp2_common/boot_stage2 /home/pi/pico/pico_logic/pico-sdk/src/rp2_common/boot_stage2/CMakeFiles/bs2_default_padded_checksummed_asm.dir/DependInfo.cmake --color=
+make[2]: Leaving directory '/home/pi/pico/pico_logic'
+make -s -f pico-sdk/src/rp2_common/boot_stage2/CMakeFiles/bs2_default_padded_checksummed_asm.dir/build.make pico-sdk/src/rp2_common/boot_stage2/CMakeFiles/bs2_default_padded_checksummed_asm.dir/build
+make[2]: Entering directory '/home/pi/pico/pico_logic'
+make[2]: Leaving directory '/home/pi/pico/pico_logic'
+make -s -f pico-sdk/src/rp2_common/cyw43_driver/CMakeFiles/cyw43_firmware_package.dir/build.make pico-sdk/src/rp2_common/cyw43_driver/CMakeFiles/cyw43_firmware_package.dir/depend
+make[2]: Entering directory '/home/pi/pico/pico_logic'
+cd /home/pi/pico/pico_logic && /usr/bin/cmake -E cmake_depends "Unix Makefiles" /home/pi/pico/pico_logic /home/pi/pico/pico-sdk/src/rp2_common/cyw43_driver /home/pi/pico/pico_logic /home/pi/pico/pico_logic/pico-sdk/src/rp2_common/cyw43_driver /home/pi/pico/pico_logic/pico-sdk/src/rp2_common/cyw43_driver/CMakeFiles/cyw43_firmware_package.dir/DependInfo.cmake --color=
+make[2]: Leaving directory '/home/pi/pico/pico_logic'
+make -s -f pico-sdk/src/rp2_common/cyw43_driver/CMakeFiles/cyw43_firmware_package.dir/build.make pico-sdk/src/rp2_common/cyw43_driver/CMakeFiles/cyw43_firmware_package.dir/build
+make[2]: Entering directory '/home/pi/pico/pico_logic'
+/usr/bin/cmake -E cmake_echo_color --switch= --blue --bold --progress-dir=/home/pi/pico/pico_logic/CMakeFiles --progress-num= "Generating cyw43_resource.o"
+cd /home/pi/pico/pico-sdk/lib/cyw43-driver/firmware && /usr/bin/objcopy -I binary -O elf32-littlearm -B arm --readonly-text --rename-section .data=.big_const,contents,alloc,load,readonly,data --redefine-sym _binary_43439A0_7_95_49_00_combined_start=fw_43439A0_7_95_49_00_start --redefine-sym _binary_43439A0_7_95_49_00_combined_end=fw_43439A0_7_95_49_00_end --redefine-sym _binary_43439A0_7_95_49_00_combined_size=fw_43439A0_7_95_49_00_size 43439A0-7.95.49.00.combined /home/pi/pico/pico_logic/pico-sdk/src/rp2_common/cyw43_driver/cyw43_resource.o
+make[2]: Leaving directory '/home/pi/pico/pico_logic'
+/usr/bin/cmake -E cmake_echo_color --switch= --progress-dir=/home/pi/pico/pico_logic/CMakeFiles --progress-num= "Built target cyw43_firmware_package"
+make[1]: Leaving directory '/home/pi/pico/pico_logic'
+make: Leaving directory '/home/pi/pico/pico_logic'
+ 
+make[3]: *** No targets specified and no makefile found.  Stop.
+make[2]: *** [pico-sdk/src/rp2_common/cyw43_driver/CMakeFiles/PioasmBuild.dir/build.make:131: pico-sdk/src/rp2_common/cyw43_driver/pioasm/src/PioasmBuild-stamp/PioasmBuild-build] Error 2
+make[1]: *** [CMakeFiles/Makefile2:1833: pico-sdk/src/rp2_common/cyw43_driver/CMakeFiles/PioasmBuild.dir/all] Error 2
+make[3]: *** No targets specified and no makefile found.  Stop.
+make[2]: *** [CMakeFiles/ELF2UF2Build.dir/build.make:130: elf2uf2/src/ELF2UF2Build-stamp/ELF2UF2Build-build] Error 2
+make[1]: *** [CMakeFiles/Makefile2:1669: CMakeFiles/ELF2UF2Build.dir/all] Error 2
+make[2]: *** No rule to make target 'pico-sdk/src/rp2_common/boot_stage2/bs2_default.elf', needed by 'pico-sdk/src/rp2_common/boot_stage2/bs2_default.bin'.
+make[1]: *** [CMakeFiles/Makefile2:1725: pico-sdk/src/rp2_common/boot_stage2/CMakeFiles/bs2_default_padded_checksummed_asm.dir/all] Error 2
+make: *** [Makefile:103: all] Error 2
+
