@@ -20,10 +20,10 @@ void get_device_read_params(uint32_t* buffer);
 bool process_command(uint8_t* aData, size_t aLen);
 uint encode_string_no_copy(const uint8_t* str, const uint str_len, PADDED_STRING_T* string);
 
-bool command_complete(uint8_t const *aBuffer, size_t aLen)
+bool command_complete(uint8_t const *data, size_t data_len)
 {
-    responseBuffer = aBuffer;
-    responseBufferLen = aLen;
+    responseBuffer = data;
+    responseBufferLen = data_len;
 }
 
 #define CREATE_LINK 10

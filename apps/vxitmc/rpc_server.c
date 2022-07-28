@@ -108,7 +108,6 @@ err_t tcp_server_sent(void *arg, struct tcp_pcb *tpcb, u16_t len)
 {
     TCP_SERVER_T *state = (TCP_SERVER_T*)arg;
     DEBUG_printf("tcp_server_sent %u\n", len);
-    state->sent_len += len;
     
     return ERR_OK;
 }
@@ -195,40 +194,19 @@ err_t decode_buffer(struct tcp_pcb *tpcb, TCP_SERVER_T *state)
         {
             DEBUG_printf("GETADDR\n");
             SEND_T send_data[2];
-            uint len = get_address(htonl(prog), (void*) &state->buffer_sent);
+            uint32_t address[16];
+            uint len = get_address(htonl(prog), (void*) &address);
             create_rpc_reply(&rpc_reply, rpc_call->xid, sizeof(TCP_RPC_REPLY_T) - 4 +len);
-
-            // rpc_reply.header = htonl(0x80000000 + 24 + len);
-            // rpc_reply.xid = rpc_call->xid;
-            // rpc_reply.msg_type = htonl(1);
-            // rpc_reply.state = 0;
-            // rpc_reply.version = 0;
-            // rpc_reply.version_len = 0;
-            // rpc_reply.acceptance_state = 0;
 
             send_data[0].ptr = (void*)&rpc_reply;
             send_data[0].length = sizeof(TCP_RPC_REPLY_T);
             send_data[0].flags = TCP_WRITE_FLAG_COPY | TCP_WRITE_FLAG_MORE;
 
-            // err_t err = tcp_write(tpcb, (void*)&rpc_reply, sizeof(TCP_RPC_REPLY_T), TCP_WRITE_FLAG_COPY | TCP_WRITE_FLAG_MORE);
-            // if (err != ERR_OK) 
-            // {
-            //     DEBUG_printf("Failed to write data %d\n", err);
-            //     return ERR_MEM;
-            // }
-        
-            send_data[1].ptr = (void*)&state->buffer_sent;
+            send_data[1].ptr = (void*)&address;
             send_data[1].length = len;
             send_data[1].flags = TCP_WRITE_FLAG_COPY;
                 
-            // err = tcp_write(tpcb, (void*)state->buffer_sent, len, TCP_WRITE_FLAG_COPY);
-            // if (err != ERR_OK) 
-            // {
-            //     DEBUG_printf("Failed to write data %d\n", err);
-            //     return ERR_MEM;
-            // }
             return send_data_list(tpcb, send_data, 2);
-
         }
     }
     else if (program == 395183)

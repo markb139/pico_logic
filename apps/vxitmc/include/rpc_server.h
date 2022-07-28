@@ -10,9 +10,7 @@ typedef struct TCP_SERVER_T_ {
     struct tcp_pcb *server_pcb;
     struct tcp_pcb *client_pcb;
     bool complete;
-    uint32_t buffer_sent[16];
     uint32_t buffer_recv[BUF_SIZE];
-    int sent_len;
     int recv_len;
 } TCP_SERVER_T;
 
@@ -70,4 +68,5 @@ uint decode_string(void* buffer, uint8_t* string_data);
 uint encode_string(const uint8_t* str, const uint str_len, void* buffer);
 void create_rpc_reply(TCP_RPC_REPLY_T* rpc_reply, uint32_t xid, uint32_t length);
 err_t send_data_list(struct tcp_pcb *tpcb, SEND_T * data, uint length);
+
 #endif
