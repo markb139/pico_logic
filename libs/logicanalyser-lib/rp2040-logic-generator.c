@@ -15,8 +15,6 @@
 #include "logic_analyser.pio.h"
 
 
-#define GEN_DMA_CHAN 1
-
 typedef struct {
     PIO pio;
     uint state_machine;
@@ -25,6 +23,7 @@ typedef struct {
     uint32_t random_buf[32];
     bool dma_conf;
     bool random_run;
+    uint dma_chan;
     uint pin_base;
     uint pin_count;
     dma_channel_config dma_c;
@@ -43,7 +42,8 @@ void generator_initialise(PIO pio, uint sm)
     generator->state_machine = sm;
     generator->pin_base = 10;
     generator->pin_count = 8;
-    generator->dma_c = dma_channel_get_default_config(GEN_DMA_CHAN);
+    generator->dma_chan = 3; //dma_claim_unused_channel (true);dma_claim_unused_channel (true);
+    generator->dma_c = dma_channel_get_default_config(generator->dma_chan);
     channel_config_set_read_increment(&generator->dma_c, true);
     channel_config_set_write_increment(&generator->dma_c, false);
     channel_config_set_dreq(&generator->dma_c, pio_get_dreq(pio, sm, true));
@@ -59,7 +59,7 @@ void generate_random()
     generator->dma_conf = true;
 
     // configure a one shot DMA request.
-    dma_channel_configure(GEN_DMA_CHAN, &generator->dma_c,
+    dma_channel_configure(generator->dma_chan, &generator->dma_c,
         &generator->pio->txf[generator->state_machine],   // Destinatinon pointer
         generator->random_buf,      // Source pointer
         32,              // Number of transfers
@@ -69,7 +69,7 @@ void generate_random()
 
 void random_handler()
 {
-    dma_hw->ints1 = 1u << 1;
+    dma_hw->ints1 = 1u << generator->dma_chan;
     
     if(generator->random_run)
         generate_random();
@@ -89,7 +89,7 @@ void generate_pattern(PIO pio, uint sm, uint pattern, float div)
         if(generator->dma_conf)
         {
             generator->random_run = false;
-            dma_channel_abort(1);
+            dma_channel_abort(generator->dma_chan);
         }
     }
     
@@ -143,7 +143,7 @@ void generate_pattern(PIO pio, uint sm, uint pattern, float div)
         if(!generator->dma_conf)
         {
             // generate an IRQ and the end of the capture
-            dma_channel_set_irq1_enabled(GEN_DMA_CHAN, true);
+            dma_channel_set_irq1_enabled(generator->dma_chan, true);
             irq_set_exclusive_handler(DMA_IRQ_1, random_handler);
             irq_set_enabled(DMA_IRQ_1, true);
         }

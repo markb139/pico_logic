@@ -4,6 +4,7 @@
 *.elf
 *.uf2
 *.dis
+*.log
 Makefile
 pico_sdk_import.cmake
 CMakeCache.txt

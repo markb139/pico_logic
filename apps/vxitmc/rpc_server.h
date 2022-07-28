@@ -4,7 +4,6 @@
 #define TCP_PORT 111
 #define BUF_SIZE 128
 #define POLL_TIME_S 5
-// #define DEBUG_printf printf
 #define DEBUG_printf 
 
 typedef struct TCP_SERVER_T_ {
@@ -65,7 +64,6 @@ typedef struct send_t_ {
     uint32_t length;
     uint32_t flags;
 } SEND_T;
-
 
 err_t rpc_server_start(void);
 uint decode_string(void* buffer, uint8_t* string_data);
