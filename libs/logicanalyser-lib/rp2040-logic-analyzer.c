@@ -3,7 +3,7 @@
  * Removed serial command handling
  * use dma for background capture
  * use 2 different PIO programms for fast and slow capture - min PIO clock is 2khz
- * /
+ */
 
 /**
  * Modified by Mark Komus 2021
@@ -53,10 +53,6 @@ struct pio_program pio_program;
  * *****************************************************************************************/
 void logic_analyser_init(PIO pio, uint sm, uint pin_base, uint pin_count, uint trigger_pin, uint trigger_type, float div) 
 {
-    uint prog_offset;
-    uint wrap_target;
-    uint wrap;
-
     pio_sm_config c = pio_get_default_sm_config();
     // remove any current PIO proram from the statemachine
     if(current_program)

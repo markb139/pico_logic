@@ -11,10 +11,8 @@ static inline uint32_t tu_max32 (uint32_t x, uint32_t y) { return (x > y) ? x : 
 void dma_irq();
 uint dma_chan;
 
-#define PIN_BASE 2
-
 #define _CMD(_CMD_STR, _STR_LEN, _FUNC) \
-    if(aLen >=_STR_LEN && !strncasecmp(_CMD_STR, aData,_STR_LEN)) \
+    if(aLen >=_STR_LEN && !strncasecmp(_CMD_STR, (char*)aData,_STR_LEN)) \
         _FUNC(aData, aLen);
 
 bool process_command(uint8_t* aData, size_t aLen)
@@ -33,7 +31,7 @@ bool process_command(uint8_t* aData, size_t aLen)
 
 void process_idn(uint8_t const *aBuffer, size_t aLen)
 {
-    command_complete(idn, strlen(idn));
+    command_complete(idn, strlen((const char*)idn));
 }
 
 void process_pattern(uint8_t const *aBuffer, size_t aLen)
@@ -60,9 +58,9 @@ void process_data(uint8_t const *aBuffer, size_t aLen)
 void process_opc(uint8_t const *aBuffer, size_t aLen)
 {
     if(commandComplete)
-        command_complete(opc_1, strlen(opc_1));
+        command_complete(opc_1, strlen((const char*)opc_1));
     else
-        command_complete(opc_0, strlen(opc_0));
+        command_complete(opc_0, strlen((const char*)opc_0));
 }
 
 void process_esr(uint8_t const *aBuffer, size_t aLen)
@@ -71,10 +69,11 @@ void process_esr(uint8_t const *aBuffer, size_t aLen)
     {
         free(esr_buf);
     }
-     esr_buf = malloc(32);
+    
+    esr_buf = malloc(32);
 
-    sprintf(esr_buf, "%d\r\n", status_register);
-    command_complete(esr_buf, strlen(esr_buf));
+    sprintf((char*)esr_buf, "%ld\r\n", status_register);
+    command_complete((const uint8_t *)esr_buf, strlen((const char *)esr_buf));
     status_register = 0;
 }
 
@@ -82,7 +81,7 @@ void process_capture(uint8_t const *aData, size_t aLen)
 {
     PIO pio = pio0;
     uint sm = 0;
-    uint pin_base = PIN_BASE;
+    uint pin_base = ANALYSER_PIN_BASE;
 
     num_samples = tu_max32(atoi((char*)aData + 10), 1);
     if(num_samples > 200000)
@@ -95,7 +94,7 @@ void process_capture(uint8_t const *aData, size_t aLen)
     {
         float sample_div = (float) clock_get_hz(clk_sys) / sample_rate;
         uint trigger_pin = pin_base + trig_channel;
-        generate_pattern(pio1, 1, pattern, 1250.0);
+        generate_pattern(pio1, 1, pattern, GENERATOR_PIN_BASE, 1250.0);
         dma_chan = 2; //dma_claim_unused_channel (true);
         printf("DMA channel %d\n",dma_chan);
         if(run_analyzer(8, num_samples, pio, sm, pin_base, sample_div, dma_chan, trigger_pin, trig_type))
@@ -130,7 +129,7 @@ void dma_irq()
 
 void process_capture_result()
 {
-    uint8_t header[12];
+    char header[12];
     uint8_t* buffer = (uint8_t*)capture_buf;
  
     sprintf(header, "#6%06d", num_samples);

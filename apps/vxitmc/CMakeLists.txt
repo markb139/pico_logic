@@ -10,6 +10,10 @@ add_executable(vxitmc
         ${CMAKE_CURRENT_SOURCE_DIR}/../commands.c
 )
 
+add_compile_definitions(PICO_DEFAULT_UART_TX_PIN=16)
+add_compile_definitions(PICO_DEFAULT_UART_RX_PIN=17)
+
+
 if (ENABLE_EEPROM)
         message("ENABLE_EEPROM")
         add_compile_definitions(ENABLE_EEPROM=TRUE)

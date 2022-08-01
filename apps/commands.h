@@ -7,9 +7,9 @@
     #define MAX_BUFFER_SIZE 50002
 #endif
 
-static const char idn[] = "Rasp Pico Logic,1.0,1001,v1.0\r\n";
-static const char opc_1[] = "1\r\n";
-static const char opc_0[] = "0\r\n";
+static const uint8_t idn[] = "Rasp Pico Logic,1.0,1001,v1.0\r\n";
+static const uint8_t opc_1[] = "1\r\n";
+static const uint8_t opc_0[] = "0\r\n";
 static bool commandComplete;
 uint32_t capture_buf[MAX_BUFFER_SIZE];
 

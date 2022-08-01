@@ -17,6 +17,7 @@ set(PICO_SDK_PATH "/home/pi/pico/pico-sdk")
 # Initialise the Pico SDK
 pico_sdk_init()
 
+add_compile_options(-Wall)
 
 # add the analyser library
 add_subdirectory(libs)
