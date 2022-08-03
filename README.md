@@ -7,3 +7,6 @@ There are two builds included in the project. usbtmc for usb connections. And vx
 
 ## Pico W support
 The vxitmc build is designed to work with the Pico W and an external EEPROM connected via I2C. The EEPROM is used for storing Wifi credntials.
+
+## Python support
+The module will respond over WiFi using the VXI-11 protocol. There is an exmaple in the python subdirectory
