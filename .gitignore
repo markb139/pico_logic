@@ -15,3 +15,4 @@ CMakeFiles/
 build/
 elf2uf2/
 pioasm/
+venv/
