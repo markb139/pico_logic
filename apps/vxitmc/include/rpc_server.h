@@ -51,6 +51,10 @@ typedef struct TCP_RPC_REPLY_T_ {
     uint32_t acceptance_state;
 } TCP_RPC_REPLY_T;
 
+typedef struct GETPORT_REPLY_T_ {
+    uint32_t port;
+} GETPORT_REPLY_T;
+
 typedef struct PADDED_STRING_T_ {
     uint32_t length;
     uint8_t* contents;

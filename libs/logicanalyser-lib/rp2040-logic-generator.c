@@ -31,7 +31,7 @@ typedef struct {
 
 Generator* generator=NULL;
 
-void generator_initialise(PIO pio, uint sm, uint pin_base)
+void generator_initialise(PIO pio, uint sm, uint pin_base, uint dma_channel)
 {
     generator = (Generator*)malloc(sizeof(Generator));
     generator->generator_offset = 0;
@@ -42,7 +42,7 @@ void generator_initialise(PIO pio, uint sm, uint pin_base)
     generator->state_machine = sm;
     generator->pin_base = pin_base;
     generator->pin_count = 8;
-    generator->dma_chan = 3; //dma_claim_unused_channel (true);dma_claim_unused_channel (true);
+    generator->dma_chan = dma_channel;
     generator->dma_c = dma_channel_get_default_config(generator->dma_chan);
     channel_config_set_read_increment(&generator->dma_c, true);
     channel_config_set_write_increment(&generator->dma_c, false);
@@ -75,10 +75,10 @@ void random_handler()
         generate_random();
 }
 
-void generate_pattern(PIO pio, uint sm, uint pattern, uint pin_base, float div)
+void generate_pattern(PIO pio, uint sm, uint pattern, uint pin_base, uint dma_channel, float div)
 {
     if(!generator)
-        generator_initialise(pio, sm, pin_base);
+        generator_initialise(pio, sm, pin_base, dma_channel);
 
     if(generator->generator_current_program)
     {

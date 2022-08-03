@@ -192,21 +192,42 @@ err_t decode_buffer(struct tcp_pcb *tpcb, TCP_SERVER_T *state)
     {
         if(htonl(rpc_call->procedure) == 3)
         {
-            DEBUG_printf("GETADDR\n");
-            SEND_T send_data[2];
-            uint32_t address[16];
-            uint len = get_address(htonl(prog), (void*) &address);
-            create_rpc_reply(&rpc_reply, rpc_call->xid, sizeof(TCP_RPC_REPLY_T) - 4 +len);
+            if(htonl(rpc_call->version) == 4)
+            {
+                DEBUG_printf("GETADDR\n");
+                SEND_T send_data[2];
+                uint32_t address[16];
+                uint len = get_address(htonl(prog), (void*) &address);
+                create_rpc_reply(&rpc_reply, rpc_call->xid, sizeof(TCP_RPC_REPLY_T) - 4 +len);
 
-            send_data[0].ptr = (void*)&rpc_reply;
-            send_data[0].length = sizeof(TCP_RPC_REPLY_T);
-            send_data[0].flags = TCP_WRITE_FLAG_COPY | TCP_WRITE_FLAG_MORE;
+                send_data[0].ptr = (void*)&rpc_reply;
+                send_data[0].length = sizeof(TCP_RPC_REPLY_T);
+                send_data[0].flags = TCP_WRITE_FLAG_COPY | TCP_WRITE_FLAG_MORE;
 
-            send_data[1].ptr = (void*)&address;
-            send_data[1].length = len;
-            send_data[1].flags = TCP_WRITE_FLAG_COPY;
+                send_data[1].ptr = (void*)&address;
+                send_data[1].length = len;
+                send_data[1].flags = TCP_WRITE_FLAG_COPY;
+                    
+                return send_data_list(tpcb, send_data, 2);
+            }
+            else if(htonl(rpc_call->version) == 2)
+            {
+                DEBUG_printf("GETPORT\n");
+                SEND_T send_data[2];
+                GETPORT_REPLY_T getport_reply;
+                create_rpc_reply(&rpc_reply, rpc_call->xid, sizeof(TCP_RPC_REPLY_T) + sizeof(GETPORT_REPLY_T) - 4);
+                send_data[0].ptr = (void*)&rpc_reply;
+                send_data[0].length = sizeof(TCP_RPC_REPLY_T);
+                send_data[0].flags = TCP_WRITE_FLAG_COPY | TCP_WRITE_FLAG_MORE;
+
+                getport_reply.port = htonl(111);
+
+                send_data[1].ptr = (void*)&getport_reply;
+                send_data[1].length = sizeof(GETPORT_REPLY_T);
+                send_data[1].flags = TCP_WRITE_FLAG_COPY;
                 
-            return send_data_list(tpcb, send_data, 2);
+                return send_data_list(tpcb, send_data, 2);
+            }
         }
     }
     else if (program == 395183)

@@ -22,6 +22,7 @@ static uint32_t status_register;
 uint trig_channel=0;
 uint trig_type=0;
 
+void initialise_commands();
 bool command_complete(uint8_t const *data, size_t data_len);
 void process_capture_result();
 void process_idn(uint8_t const *aBuffer, size_t aLen);

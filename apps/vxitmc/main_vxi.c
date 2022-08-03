@@ -21,6 +21,8 @@
 #define I2C_SDA_PIN 18
 #define I2C_SCL_PIN 19
 
+void initialise_commands();
+
 typedef struct WIFI_DATA_T_ {
     uint8_t ssid[128];
     uint8_t pwd[128];
@@ -63,6 +65,9 @@ void initialise()
     gpio_set_dir(21, GPIO_OUT);
     gpio_put(20, 0);
     gpio_put(21, 0);
+
+    initialise_commands();
+
     if (cyw43_arch_init()) 
     {
         printf("failed to initialise\n");

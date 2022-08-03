@@ -10,10 +10,17 @@
 static inline uint32_t tu_max32 (uint32_t x, uint32_t y) { return (x > y) ? x : y; }
 void dma_irq();
 uint dma_chan;
+uint generator_dma_channel;
 
 #define _CMD(_CMD_STR, _STR_LEN, _FUNC) \
     if(aLen >=_STR_LEN && !strncasecmp(_CMD_STR, (char*)aData,_STR_LEN)) \
         _FUNC(aData, aLen);
+
+void initialise_commands()
+{
+    dma_chan = dma_claim_unused_channel (true);
+    generator_dma_channel = dma_claim_unused_channel (true);
+}
 
 bool process_command(uint8_t* aData, size_t aLen)
 {
@@ -94,9 +101,8 @@ void process_capture(uint8_t const *aData, size_t aLen)
     {
         float sample_div = (float) clock_get_hz(clk_sys) / sample_rate;
         uint trigger_pin = pin_base + trig_channel;
-        generate_pattern(pio1, 1, pattern, GENERATOR_PIN_BASE, 1250.0);
-        dma_chan = 2; //dma_claim_unused_channel (true);
-        printf("DMA channel %d\n",dma_chan);
+        generate_pattern(pio1, 1, pattern, GENERATOR_PIN_BASE, generator_dma_channel, 1250.0);
+        printf("DMA channel %d generator_dma_channel %d\n",dma_chan, generator_dma_channel);
         if(run_analyzer(8, num_samples, pio, sm, pin_base, sample_div, dma_chan, trigger_pin, trig_type))
         {
             sampleRun = true;
