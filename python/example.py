@@ -2,37 +2,51 @@ import vxi11
 import time
 
 class PicoLogic:
+    GENERATOR_OFF=0
+    GENERATOR_SQUARE_WAVE=1
+    GENERATOR_COUNT=2
+    GENERATOR_RANDOM=3
+    TRIGGER_OFF=0
+    TRIGGER_LOW_LEVEL=1
+    TRIGGER_HIGH_LEVEL=2
+    TRIGGER_POS_EDGE=3
+    TRIGGER_NEG_EDGE=4
+
+
     def __init__(self, vxi11):
-            self.vxi11 = vxi11
+        self.vxi11 = vxi11
 
     def idn(self):
-            return self.vxi11.ask("*IDN?")
+        return self.vxi11.ask("*IDN?")
 
     def set_pattern(self, pattern):
-            self.vxi11.write(f"l:pat {pattern}")
+        self.vxi11.write(f"l:pat {pattern}")
 
     def set_rate(self, rate):
-            self.vxi11.write(f"rate {rate}")
+        self.vxi11.write(f"rate {rate}")
+
+    def set_trigger(self, trigger_channel, trigger_type):
+        self.vxi11.write(f"trig {trigger_channel} {trigger_type}")
 
     def start_capture(self, num_samples):
-            self.vxi11.write(f"l:capture {num_samples}")
+        self.vxi11.write(f"l:capture {num_samples}")
 
     def get_opc(self):
-            self.vxi11.write("*opc?")
-            return instr.read_raw(num=3)[0]-48
+        self.vxi11.write("*opc?")
+        return instr.read_raw(num=3)[0]-48
 
     def get_data(self):
-            self.vxi11.write("data?")
-            return self.vxi11.read_raw()[8:]
+        self.vxi11.write("data?")
+        return self.vxi11.read_raw()[8:]
 
 instr = vxi11.Instrument("192.168.1.46")
 pico = PicoLogic(instr)
 
 print(pico.idn())
 
-pico.set_rate(100000)
-pico.set_pattern(2)
-instr.write("trig 7 1")
+pico.set_rate(500000)
+pico.set_pattern(PicoLogic.GENERATOR_OFF)
+pico.set_trigger(0,PicoLogic.TRIGGER_OFF)
 pico.start_capture(20)
 
 while pico.get_opc() != 1:
